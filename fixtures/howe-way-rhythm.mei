@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.0">
+   <meiHead><fileDesc><titleStmt><title>Howe-Way rhythm and ledger lines</title></titleStmt><pubStmt/></fileDesc></meiHead>
+   <music><body><mdiv><score>
+      <scoreDef meter.count="4" meter.unit="4">
+         <staffGrp><staffDef n="1" type="howe-way" lines="6" clef.shape="G" clef.line="2"/></staffGrp>
+      </scoreDef>
+      <section>
+         <measure n="1"><staff n="1"><layer n="1">
+            <note xml:id="whole-low" dur="1" pname="a" oct="3"/>
+         </layer></staff></measure>
+         <measure n="2"><staff n="1"><layer n="1">
+            <note xml:id="whole-high" dur="1" pname="c" oct="6" accid="s"/>
+         </layer></staff></measure>
+         <measure n="3"><staff n="1"><layer n="1">
+            <note xml:id="half-c" dur="2" pname="c" oct="4"/>
+            <note xml:id="half-f" dur="2" pname="f" oct="4"/>
+         </layer></staff></measure>
+         <measure n="4"><staff n="1"><layer n="1">
+            <note xml:id="dotted" dur="4" dots="1" pname="d" oct="4"/>
+            <note xml:id="flagged" dur="8" pname="e" oct="4"/>
+            <beam>
+               <note xml:id="beam-a" dur="8" pname="a" oct="4"/>
+               <note xml:id="beam-b" dur="8" pname="b" oct="4" accid="f"/>
+            </beam>
+            <note xml:id="written" dur="4" pname="c" oct="4" pnum="74"/>
+         </layer></staff></measure>
+         <measure n="5"><staff n="1"><layer n="1">
+            <chord xml:id="whole-chord" dur="1" stem.dir="down">
+               <note xml:id="whole-root" pname="c" oct="4"/>
+               <note xml:id="whole-third" pname="e" oct="4"/>
+               <note xml:id="whole-fifth" pname="g" oct="4"/>
+            </chord>
+         </layer></staff></measure>
+      </section>
+   </score></mdiv></body></music>
+</mei>
