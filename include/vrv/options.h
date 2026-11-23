@@ -57,6 +57,8 @@ class OptionGrp;
 // Option defines
 //----------------------------------------------------------------------------
 
+enum option_NOTATION_SYSTEM { NOTATION_SYSTEM_encoded, NOTATION_SYSTEM_howeWay };
+
 enum option_BREAKS { BREAKS_none = 0, BREAKS_auto, BREAKS_line, BREAKS_smart, BREAKS_encoded };
 
 enum option_CONDENSE { CONDENSE_none = 0, CONDENSE_auto, CONDENSE_all, CONDENSE_encoded };
@@ -151,6 +153,7 @@ public:
     static const std::map<int, std::string> s_durationEq;
     static const std::map<int, std::string> s_elision;
     static const std::map<int, std::string> s_fontFallback;
+    static const std::map<int, std::string> s_notationSystem;
     static const std::map<int, std::string> s_footer;
     static const std::map<int, std::string> s_header;
     static const std::map<int, std::string> s_ligatureOblique;
@@ -653,6 +656,8 @@ public:
     OptionDbl m_minLastJustification;
     OptionBool m_mmOutput;
     OptionBool m_moveScoreDefinitionToStaff;
+    OptionJson m_howeWayReferenceOctaves;
+    OptionIntMap m_notationSystem;
     OptionBool m_neumeAsNote;
     OptionBool m_noJustification;
     OptionBool m_openControlEvents;

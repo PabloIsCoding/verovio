@@ -84,6 +84,7 @@ void Staff::Reset()
 
     m_drawingStaffSize = 100;
     m_drawingLines = 5;
+    m_howeWayReferenceOctave = -1;
     m_drawingNotationType = NOTATIONTYPE_NONE;
     m_staffAlignment = NULL;
     m_timeSpanningElements.clear();
@@ -100,6 +101,7 @@ void Staff::CloneReset()
 
     m_drawingStaffSize = 100;
     m_drawingLines = 5;
+    m_howeWayReferenceOctave = -1;
     m_drawingNotationType = NOTATIONTYPE_NONE;
     m_staffAlignment = NULL;
     m_timeSpanningElements.clear();
@@ -246,9 +248,29 @@ bool Staff::DrawingIsVisible() const
     return (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN);
 }
 
-bool Staff::IsHoweWay() const
+void Staff::SetDrawingNotation(const StaffDef *staffDef, const Options *options)
 {
-    return m_drawingStaffDef && m_drawingStaffDef->GetType() == "howe-way";
+    m_drawingNotationType = staffDef->GetNotationtype();
+    m_drawingLines = staffDef->GetLines();
+    m_howeWayReferenceOctave = -1;
+    const bool convert = options->m_notationSystem.GetValue() == NOTATION_SYSTEM_howeWay
+        && (m_drawingNotationType == NOTATIONTYPE_NONE || m_drawingNotationType == NOTATIONTYPE_cmn)
+        && (m_drawingLines == 5);
+    if (!convert && staffDef->GetType() != "howe-way") return;
+
+    m_drawingLines = 6;
+    m_howeWayReferenceOctave = 4;
+    const jsonxx::Object references = options->m_howeWayReferenceOctaves.GetValue();
+    const std::string key = std::to_string(this->GetN());
+    if (!references.has<jsonxx::Value>(key)) return;
+    if (references.has<jsonxx::Number>(key)) {
+        const double octave = references.get<jsonxx::Number>(key);
+        if (octave >= 0 && octave <= 9 && octave == std::floor(octave)) {
+            m_howeWayReferenceOctave = static_cast<int>(octave);
+            return;
+        }
+    }
+    LogWarning("Invalid Howe-Way reference octave for staff %d; using C4", this->GetN());
 }
 
 bool Staff::IsMensural() const

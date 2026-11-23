@@ -38,6 +38,8 @@ const std::map<int, std::string> Option::s_elision = { { ELISION_regular, "regul
 const std::map<int, std::string> Option::s_fontFallback
     = { { FONT_FALLBACK_Leipzig, "Leipzig" }, { FONT_FALLBACK_Bravura, "Bravura" } };
 
+const std::map<int, std::string> Option::s_notationSystem
+    = { { NOTATION_SYSTEM_encoded, "encoded" }, { NOTATION_SYSTEM_howeWay, "howe-way" } };
 const std::map<int, std::string> Option::s_footer
     = { { FOOTER_none, "none" }, { FOOTER_auto, "auto" }, { FOOTER_encoded, "encoded" }, { FOOTER_always, "always" } };
 
@@ -1069,6 +1071,15 @@ Options::Options()
         "Move score definition (clef, keySig, meterSig, etc.) from scoreDef to staffDef");
     m_moveScoreDefinitionToStaff.Init(false);
     this->Register(&m_moveScoreDefinitionToStaff, "moveScoreDefinitionToStaff", &m_general);
+
+    m_howeWayReferenceOctaves.SetInfo("Howe-Way reference octaves",
+        "Bottom-line C octave (0 to 9) by staff number, as a JSON object. Unspecified staves use C4.");
+    m_howeWayReferenceOctaves.Init(JsonSource::String, "{}");
+    this->Register(&m_howeWayReferenceOctaves, "howeWayReferenceOctaves", &m_general);
+
+    m_notationSystem.SetInfo("Notation system", "Render pitched CMN staves as encoded or in Howe-Way notation");
+    m_notationSystem.Init(NOTATION_SYSTEM_encoded, &Option::s_notationSystem);
+    this->Register(&m_notationSystem, "notationSystem", &m_general);
 
     m_neumeAsNote.SetInfo("Neume as note", "Render neumes as note heads instead of original notation");
     m_neumeAsNote.Init(false);

@@ -161,7 +161,7 @@ int PitchInterface::CalcLoc(
         else if (note->HasPname() && (note->HasOct() || note->HasOctDefault())) {
             const Staff *staff = note->GetAncestorStaff(RESOLVE_CROSS_STAFF);
             if (staff->IsHoweWay()) {
-                const int semitones = note->GetWrittenSemitonesFromC4();
+                const int semitones = note->GetWrittenSemitonesFromC4() - 12 * (staff->GetHoweWayReferenceOctave() - 4);
                 // Floor division pairs B3 with B-flat3, one position below C4.
                 return (semitones - (semitones < 0)) / 2;
             }

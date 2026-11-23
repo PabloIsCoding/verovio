@@ -19,6 +19,7 @@ class DeviceContext;
 class Layer;
 class LedgerLine;
 class Measure;
+class Options;
 class StaffAlignment;
 class StaffDef;
 class Syl;
@@ -221,7 +222,9 @@ public:
      * @name Get notation type
      */
     ///@{
-    bool IsHoweWay() const;
+    void SetDrawingNotation(const StaffDef *staffDef, const Options *options);
+    bool IsHoweWay() const { return m_howeWayReferenceOctave >= 0; }
+    int GetHoweWayReferenceOctave() const { return m_howeWayReferenceOctave; }
     bool IsMensural() const;
     bool IsNeume() const;
     bool IsTablature() const;
@@ -356,6 +359,7 @@ private:
      * A pointer to a StaffAlignment for aligning the staves
      */
     StaffAlignment *m_staffAlignment;
+    int m_howeWayReferenceOctave;
 
     /**
      * The legder lines (above / below and normal / cue)

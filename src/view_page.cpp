@@ -324,10 +324,10 @@ void View::DrawStaffGrp(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
     int yTop = first->GetDrawingY();
     // for the bottom position we need to take into account the number of lines and the staff size
     int yBottom
-        = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
+        = last->GetDrawingY() - (last->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
     // adjust to single line staves
-    if (firstDef->GetLines() <= 1) yTop += m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
-    if (lastDef->GetLines() <= 1) yBottom -= m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
+    if (first->m_drawingLines <= 1) yTop += m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
+    if (last->m_drawingLines <= 1) yBottom -= m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
 
     // draw the system start bar line
     ScoreDef *scoreDef = vrv_cast<ScoreDef *>(staffGrp->GetFirstAncestor(SCOREDEF));
@@ -394,7 +394,7 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *sta
         // HARDCODED
         const int doubleUnit = m_doc->GetDrawingDoubleUnit(staffGrp->GetMaxStaffSize());
         const int space = doubleUnit;
-        const int y = staff->GetDrawingY() - (staffDef->GetLines() * doubleUnit / 2);
+        const int y = staff->GetDrawingY() - (staff->m_drawingLines * doubleUnit / 2);
 
         const int staffSize = staff->GetDrawingStaffNotationSize();
         int adjust = 0;
@@ -430,10 +430,10 @@ void View::DrawGrpSym(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, i
     int yTop = first->GetDrawingY();
     // for the bottom position we need to take into account the number of lines and the staff size
     int yBottom = last->GetDrawingY()
-        - (groupSymbol->GetEndDef()->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
+        - (last->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
     // for the bottom position we need to take into account the number of lines and the staff size
-    if (groupSymbol->GetStartDef()->GetLines() <= 1) yTop += m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
-    if (groupSymbol->GetEndDef()->GetLines() <= 1) yBottom -= m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
+    if (first->m_drawingLines <= 1) yTop += m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
+    if (last->m_drawingLines <= 1) yBottom -= m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
 
     switch (groupSymbol->GetSymbol()) {
         case staffGroupingSym_SYMBOL_line: {
@@ -474,7 +474,7 @@ void View::DrawLayerDefLabels(
     // constants
     const int space = m_doc->GetDrawingDoubleUnit(scoreDef->GetMaxStaffSize());
     const int yCenter
-        = staff->GetDrawingY() - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+        = staff->GetDrawingY() - (staff->m_drawingLines * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
     const int staffSize = staff->GetDrawingStaffNotationSize();
     const int pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
     const int layerDefCount = staffDef->GetChildCount(LAYERDEF);
@@ -751,7 +751,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 
         // For the bottom position we need to take into account the number of lines and the staff size
         const int yStaffTop = staff->GetDrawingY();
-        const int yStaffBottom = yStaffTop - 2 * (staffDef->GetLines() - 1) * unit;
+        const int yStaffBottom = yStaffTop - 2 * (staff->m_drawingLines - 1) * unit;
         int yBottom = yStaffBottom;
         int yLength = yStaffTop - yStaffBottom;
 
@@ -762,7 +762,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                 // bar.place counts upwards (note order).
                 yBottom += place * unit;
             }
-            else if (staffDef->GetLines() <= 1) {
+            else if (staff->m_drawingLines <= 1) {
                 // Make sure barlines are visible with a single line
                 yBottom -= 2 * unit;
             }
@@ -771,7 +771,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
             if (hasLength) {
                 yLength = length * unit;
             }
-            else if (staffDef->GetLines() <= 1) {
+            else if (staff->m_drawingLines <= 1) {
                 yLength = 4 * unit;
             }
         }

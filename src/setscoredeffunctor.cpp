@@ -325,8 +325,7 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitStaff(Staff *staff)
     staff->m_drawingStaffDef = m_currentStaffDef;
     assert(staff->m_drawingTuning == NULL);
     staff->m_drawingTuning = vrv_cast<Tuning *>(m_currentStaffDef->FindDescendantByType(TUNING));
-    staff->m_drawingLines = m_currentStaffDef->GetLines();
-    staff->m_drawingNotationType = m_currentStaffDef->GetNotationtype();
+    staff->SetDrawingNotation(m_currentStaffDef, m_doc->GetOptions());
     staff->m_drawingStaffSize = 100;
     if (m_currentStaffDef->HasScale()) {
         staff->m_drawingStaffSize = m_currentStaffDef->GetScale();
@@ -770,8 +769,7 @@ FunctorCode ScoreDefSetOssiaFunctor::VisitStaff(Staff *staff)
     staff->m_drawingStaffDef = m_currentStaffDef;
     assert(staff->m_drawingTuning == NULL);
     staff->m_drawingTuning = vrv_cast<Tuning *>(m_currentStaffDef->FindDescendantByType(TUNING));
-    staff->m_drawingLines = m_currentStaffDef->GetLines();
-    staff->m_drawingNotationType = m_currentStaffDef->GetNotationtype();
+    staff->SetDrawingNotation(m_currentStaffDef, m_doc->GetOptions());
     staff->m_drawingStaffSize = 100;
     if (m_currentStaffDef->HasScale()) {
         staff->m_drawingStaffSize = m_currentStaffDef->GetScale();
