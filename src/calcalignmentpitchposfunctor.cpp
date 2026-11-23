@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "comparison.h"
 #include "cursor.h"
 #include "custos.h"
 #include "doc.h"
@@ -366,6 +367,47 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitScoreDef(ScoreDef *scoreDef)
     m_octDefaultForStaffN.clear();
     m_octDefault = scoreDef->GetOctDefault();
 
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CalcAlignmentPitchPosFunctor::VisitStaff(Staff *staff)
+{
+    if (!staff->IsHoweWay() || !staff->m_drawingStaffDef) return FUNCTOR_CONTINUE;
+
+    // A staff here is one measure. Process aligned onsets across all its layers before
+    // positioning chords, whose positions depend on their child notes.
+    MapOfOctavedPitchAccid accidentals;
+    staff->m_drawingStaffDef->GetCurrentKeySig()->FillMap(accidentals);
+    ClassIdsComparison pitchedEvents({ KEYSIG, NOTE });
+    ListOfObjects events;
+    staff->FindAllDescendantsByComparison(&events, &pitchedEvents);
+    std::map<Fraction, std::vector<LayerElement *>> onsets;
+    for (Object *object : events) {
+        LayerElement *event = vrv_cast<LayerElement *>(object);
+        if (event->GetAlignment()) onsets[event->GetAlignment()->GetTime()].push_back(event);
+    }
+
+    const int defaultOctave
+        = m_octDefaultForStaffN.contains(staff->GetN()) ? m_octDefaultForStaffN.at(staff->GetN()) : m_octDefault;
+    for (const auto &[time, simultaneous] : onsets) {
+        for (LayerElement *event : simultaneous) {
+            if (event->Is(KEYSIG)) vrv_cast<KeySig *>(event)->FillMap(accidentals);
+        }
+        // Signs at this onset apply to later onsets; sibling voices cannot change
+        // each other's pitch merely by appearing earlier in XML traversal order.
+        MapOfOctavedPitchAccid changes;
+        for (LayerElement *event : simultaneous) {
+            if (!event->Is(NOTE)) continue;
+            Note *note = vrv_cast<Note *>(event);
+            const int octave = note->HasOct() ? note->GetOct() : defaultOctave;
+            const int pitch = note->GetPname() + 7 * octave;
+            const auto implied = accidentals.find(pitch);
+            note->SetDrawingImpliedAccid(implied == accidentals.end() ? ACCIDENTAL_WRITTEN_NONE : implied->second);
+            const Accid *accid = note->GetDrawingAccid();
+            if (accid && accid->HasAccid()) changes[pitch] = accid->GetAccid();
+        }
+        for (const auto &[pitch, accidental] : changes) accidentals[pitch] = accidental;
+    }
     return FUNCTOR_CONTINUE;
 }
 

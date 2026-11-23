@@ -235,6 +235,7 @@ public:
     int GetPitchClass() const;
     /** Chromatic distance of the written pitch from C4, including encoded alteration. */
     int GetWrittenSemitonesFromC4() const;
+    void SetDrawingImpliedAccid(data_ACCIDENTAL_WRITTEN accid) { m_drawingImpliedAccid = accid; }
 
     /**
      * @name Checker, getter and setter for a note with which the stem is shared
@@ -338,6 +339,7 @@ private:
      * A fling indicating if the note head is flipped
      */
     bool m_flippedNotehead;
+    data_ACCIDENTAL_WRITTEN m_drawingImpliedAccid;
 
     /**
      * flags for determining note groups in chord (note group this belongs to)

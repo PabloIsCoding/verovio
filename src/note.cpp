@@ -129,6 +129,7 @@ void Note::Reset()
     m_noteGroup = NULL;
 
     m_flippedNotehead = false;
+    m_drawingImpliedAccid = ACCIDENTAL_WRITTEN_NONE;
 
     m_stemSameas = NULL;
     m_stemSameasRole = SAMEAS_NONE;
@@ -140,6 +141,7 @@ void Note::CloneReset()
     m_noteGroup = NULL;
 
     m_flippedNotehead = false;
+    m_drawingImpliedAccid = ACCIDENTAL_WRITTEN_NONE;
 
     m_stemSameas = NULL;
     m_stemSameasRole = SAMEAS_NONE;
@@ -857,9 +859,10 @@ int Note::GetWrittenSemitonesFromC4() const
 {
     const int octave = this->HasOct() ? this->GetOct() : this->GetOctDefault();
     const Accid *accid = this->GetDrawingAccid();
-    const int alteration = (accid && accid->HasAccid())
-        ? TransPitch::GetChromaticAlteration(ACCIDENTAL_GESTURAL_NONE, accid->GetAccid())
-        : this->GetChromaticAlteration();
+    const data_ACCIDENTAL_WRITTEN written = (accid && accid->HasAccid()) ? accid->GetAccid() : m_drawingImpliedAccid;
+    const int alteration = (accid && !accid->HasAccid() && accid->HasAccidGes())
+        ? this->GetChromaticAlteration()
+        : TransPitch::GetChromaticAlteration(ACCIDENTAL_GESTURAL_NONE, written);
     return 12 * (octave - 4) + PnameToPclass(this->GetPname()) + alteration;
 }
 
