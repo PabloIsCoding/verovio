@@ -650,14 +650,9 @@ char32_t Note::GetMensuralNoteheadGlyph() const
 
 char32_t Note::GetNoteheadGlyph(const data_DURATION duration) const
 {
-    // EXPERIMENTAL: only quarter-note pitch-dependent glyphs are supported.
-    // Original Howe-Way rhythmic notation needs a separate complete implementation.
-    const Staff *hwStaff = this->GetAncestorStaff();
-    if (hwStaff && hwStaff->m_drawingStaffDef && hwStaff->m_drawingStaffDef->GetType() == "howe-way"
-        && duration == DURATION_4) {
-        const int semitones = this->GetMIDIPitch() - 60;
-        const bool isUpperMember = ((semitones % 2) + 2) % 2 == 1;
-        return isUpperMember ? SMUFL_E0A4_noteheadBlack : SMUFL_E0A3_noteheadHalf;
+    const Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
+    if (staff && staff->IsHoweWay() && this->HasPname() && duration >= DURATION_1) {
+        return (this->GetWrittenSemitonesFromC4() % 2) ? SMUFL_E0A4_noteheadBlack : SMUFL_E0A3_noteheadHalf;
     }
     static std::map<std::string, char32_t> additionalNoteheadSymbols
         = { { "noteheadDiamondBlackWide", SMUFL_E0DC_noteheadDiamondBlackWide },
@@ -856,6 +851,16 @@ int Note::GetMIDIPitch(const int shift, const int octaveShift) const
 
     // Apply shift, i.e. from transposition instruments
     return pitch + shift;
+}
+
+int Note::GetWrittenSemitonesFromC4() const
+{
+    const int octave = this->HasOct() ? this->GetOct() : this->GetOctDefault();
+    const Accid *accid = this->GetDrawingAccid();
+    const int alteration = (accid && accid->HasAccid())
+        ? TransPitch::GetChromaticAlteration(ACCIDENTAL_GESTURAL_NONE, accid->GetAccid())
+        : this->GetChromaticAlteration();
+    return 12 * (octave - 4) + PnameToPclass(this->GetPname()) + alteration;
 }
 
 int Note::GetPitchClass() const

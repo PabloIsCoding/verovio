@@ -246,6 +246,11 @@ bool Staff::DrawingIsVisible() const
     return (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN);
 }
 
+bool Staff::IsHoweWay() const
+{
+    return m_drawingStaffDef && m_drawingStaffDef->GetType() == "howe-way";
+}
+
 bool Staff::IsMensural() const
 {
     bool isMensural

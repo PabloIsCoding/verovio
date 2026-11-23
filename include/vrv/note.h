@@ -233,6 +233,8 @@ public:
      * Get pitch class of the current note
      */
     int GetPitchClass() const;
+    /** Chromatic distance of the written pitch from C4, including encoded alteration. */
+    int GetWrittenSemitonesFromC4() const;
 
     /**
      * @name Checker, getter and setter for a note with which the stem is shared

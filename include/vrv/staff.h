@@ -221,6 +221,7 @@ public:
      * @name Get notation type
      */
     ///@{
+    bool IsHoweWay() const;
     bool IsMensural() const;
     bool IsNeume() const;
     bool IsTablature() const;

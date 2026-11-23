@@ -1404,7 +1404,9 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, M
                         }
                     }
                 }
-                this->DrawHorizontalSegmentedLine(dc, y1, line, lineWidth);
+                // The upper C reference is the third line from the top on a six-line Howe-Way staff.
+                const bool octaveLine = staff->IsHoweWay() && staff->m_drawingLines == 6 && j == 2;
+                this->DrawHorizontalSegmentedLine(dc, y1, line, octaveLine ? 2 * lineWidth : lineWidth);
                 y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
                 y2 = y1;
             }

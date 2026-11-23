@@ -270,7 +270,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     // This can happen with accid within note with only accid.ges
     // We still create an graphic in the output
-    if (!accid->HasAccid() || staff->IsTablature()) {
+    if (!accid->HasAccid() || staff->IsTablature() || (staff->IsHoweWay() && accid->GetFirstAncestor(NOTE))) {
         dc->StartGraphic(element, "", element->GetID());
         accid->SetEmptyBB();
         if (showAccidGes) this->DrawLayerChildren(dc, accid, layer, staff, measure);
@@ -713,7 +713,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     if (clef->m_crossStaff) staff = clef->m_crossStaff;
 
     // hidden clef
-    if (!showHidden && (clef->GetVisible() == BOOLEAN_false)) {
+    if (staff->IsHoweWay() || (!showHidden && (clef->GetVisible() == BOOLEAN_false))) {
         dc->StartGraphic(element, "", element->GetID());
         clef->SetEmptyBB();
         dc->EndGraphic(element, this);
@@ -1567,7 +1567,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         else {
             // Whole notes
             char32_t fontNo;
-            if (note->GetColored() == BOOLEAN_true) {
+            if (!staff->IsHoweWay() && note->GetColored() == BOOLEAN_true) {
                 if (DURATION_1 == drawingDur) {
                     fontNo = SMUFL_E0FA_noteheadWholeFilled;
                 }
