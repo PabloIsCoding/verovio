@@ -19,6 +19,8 @@
 #include "layer.h"
 #include "note.h"
 #include "rest.h"
+#include "staff.h"
+#include "staffdef.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -164,6 +166,15 @@ int PitchInterface::CalcLoc(
                 offset = parentLayer->GetCrossStaffClefLocOffset(layerElement, offset);
             }
             const data_OCTAVE oct = (note->HasOct()) ? note->GetOct() : note->GetOctDefault();
+            // EXPERIMENTAL: six-six chromatic placement for the Howe-Way spike.
+            // The @type selector is temporary and is NOT part of a proposed public API.
+            const Staff *staff = note->GetAncestorStaff();
+            if (staff && staff->m_drawingStaffDef && staff->m_drawingStaffDef->GetType() == "howe-way") {
+                // An octave spans six staff positions. Floor division is essential
+                // below C4 (C4 = MIDI 60). Keep spelling and IDs in the original MEI.
+                const int semitones = note->GetMIDIPitch() - 60;
+                return (semitones >= 0) ? (semitones / 2) : ((semitones - 1) / 2);
+            }
             return PitchInterface::CalcLoc(note->GetPname(), oct, offset);
         }
         else {

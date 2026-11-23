@@ -650,6 +650,15 @@ char32_t Note::GetMensuralNoteheadGlyph() const
 
 char32_t Note::GetNoteheadGlyph(const data_DURATION duration) const
 {
+    // EXPERIMENTAL: only quarter-note pitch-dependent glyphs are supported.
+    // Original Howe-Way rhythmic notation needs a separate complete implementation.
+    const Staff *hwStaff = this->GetAncestorStaff();
+    if (hwStaff && hwStaff->m_drawingStaffDef && hwStaff->m_drawingStaffDef->GetType() == "howe-way"
+        && duration == DURATION_4) {
+        const int semitones = this->GetMIDIPitch() - 60;
+        const bool isUpperMember = ((semitones % 2) + 2) % 2 == 1;
+        return isUpperMember ? SMUFL_E0A4_noteheadBlack : SMUFL_E0A3_noteheadHalf;
+    }
     static std::map<std::string, char32_t> additionalNoteheadSymbols
         = { { "noteheadDiamondBlackWide", SMUFL_E0DC_noteheadDiamondBlackWide },
               { "noteheadDiamondWhiteWide", SMUFL_E0DE_noteheadDiamondWhiteWide },

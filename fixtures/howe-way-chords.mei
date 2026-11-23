@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.0">
+  <meiHead><fileDesc><titleStmt><title>Howe-Way chord stress cases</title></titleStmt><pubStmt/></fileDesc></meiHead>
+  <music><body><mdiv><score>
+    <scoreDef meter.count="4" meter.unit="4"><staffGrp><staffDef n="1" lines="6" type="howe-way"/></staffGrp></scoreDef>
+    <section>
+      <measure n="1"><staff n="1"><layer n="1">
+        <!-- Same chromatic staff location: C4 and C#4 -->
+        <chord dur="4"><note xml:id="hw_pair_c" pname="c" oct="4"/><note xml:id="hw_pair_cs" pname="c" oct="4"><accid accid="s"/></note></chord>
+        <!-- Same staff location: E4 and F4 -->
+        <chord dur="4"><note xml:id="hw_pair_e" pname="e" oct="4"/><note xml:id="hw_pair_f" pname="f" oct="4"/></chord>
+        <!-- Adjacent chromatic locations -->
+        <chord dur="4"><note xml:id="hw_adj_c" pname="c" oct="4"/><note xml:id="hw_adj_d" pname="d" oct="4"/></chord>
+        <!-- Ordinary triad -->
+        <chord dur="4"><note xml:id="hw_tri_c" pname="c" oct="4"/><note xml:id="hw_tri_e" pname="e" oct="4"/><note xml:id="hw_tri_g" pname="g" oct="4"/></chord>
+      </layer></staff></measure>
+      <measure n="2"><staff n="1"><layer n="1">
+        <!-- B3 and C4 straddle the octave boundary and must remain distinct. -->
+        <chord dur="4"><note xml:id="hw_oct_b" pname="b" oct="3"/><note xml:id="hw_oct_c" pname="c" oct="4"/></chord>
+        <!-- Enharmonic spellings should have identical visual positions and notehead types. -->
+        <note xml:id="hw_enh_cs" pname="c" oct="4" dur="4"><accid accid="s"/></note>
+        <note xml:id="hw_enh_db" pname="d" oct="4" dur="4"><accid accid="f"/></note>
+        <rest dur="4"/>
+      </layer></staff></measure>
+      <measure n="3"><staff n="1">
+        <!-- Two simultaneous voices, independent semantic events -->
+        <layer n="1"><note xml:id="hw_voice_c" pname="c" oct="4" dur="2"/><rest dur="2"/></layer>
+        <layer n="2"><note xml:id="hw_voice_cs" pname="c" oct="4" dur="2"><accid accid="s"/></note><rest dur="2"/></layer>
+      </staff></measure>
+    </section>
+  </score></mdiv></body></music>
+</mei>

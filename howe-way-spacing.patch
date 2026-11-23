@@ -1,0 +1,26 @@
+--- a/src/adjustaccidxfunctor.cpp
++++ b/src/adjustaccidxfunctor.cpp
+@@ -11,6 +11,8 @@
+ 
+ #include "doc.h"
+ #include "scoreorpartelement.h"
++#include "staff.h"
++#include "staffdef.h"
+ 
+ //----------------------------------------------------------------------------
+ 
+@@ -143,7 +145,13 @@
+     for (Object *child : alignmentReference->GetChildren()) {
+         if (child->Is(ACCID)) {
+             Accid *accid = vrv_cast<Accid *>(child);
+-            if (accid->HasAccid() && accid->GetFirstAncestor(NOTE)) accidentals.push_back(accid);
++            // Howe-Way represents the chromatic alteration with the notehead
++            // and its staff position. Keep the underlying Accid untouched,
++            // but exclude it from accidental-specific horizontal adjustment.
++            const Staff *staff = accid->GetAncestorStaff();
++            const bool howeWay = staff && staff->m_drawingStaffDef
++                && staff->m_drawingStaffDef->GetType() == "howe-way";
++            if (!howeWay && accid->HasAccid() && accid->GetFirstAncestor(NOTE)) accidentals.push_back(accid);
+         }
+     }
+     return accidentals;

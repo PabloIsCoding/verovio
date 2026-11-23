@@ -1,0 +1,45 @@
+--- a/src/pitchinterface.cpp
++++ b/src/pitchinterface.cpp
+@@ -19,6 +19,8 @@
+ #include "layer.h"
+ #include "note.h"
+ #include "rest.h"
++#include "staff.h"
++#include "staffdef.h"
+ #include "vrv.h"
+ 
+ namespace vrv {
+@@ -164,6 +166,15 @@
+                 offset = parentLayer->GetCrossStaffClefLocOffset(layerElement, offset);
+             }
+             const data_OCTAVE oct = (note->HasOct()) ? note->GetOct() : note->GetOctDefault();
++            // EXPERIMENTAL: six-six chromatic placement for the Howe-Way spike.
++            // The @type selector is temporary and is NOT part of a proposed public API.
++            const Staff *staff = note->GetAncestorStaff();
++            if (staff && staff->m_drawingStaffDef && staff->m_drawingStaffDef->GetType() == "howe-way") {
++                // An octave spans six staff positions. Floor division is essential
++                // below C4 (C4 = MIDI 60). Keep spelling and IDs in the original MEI.
++                const int semitones = note->GetMIDIPitch() - 60;
++                return (semitones >= 0) ? (semitones / 2) : ((semitones - 1) / 2);
++            }
+             return PitchInterface::CalcLoc(note->GetPname(), oct, offset);
+         }
+         else {
+--- a/src/note.cpp
++++ b/src/note.cpp
+@@ -650,6 +650,15 @@
+ 
+ char32_t Note::GetNoteheadGlyph(const data_DURATION duration) const
+ {
++    // EXPERIMENTAL: only quarter-note pitch-dependent glyphs are supported.
++    // Original Howe-Way rhythmic notation needs a separate complete implementation.
++    const Staff *hwStaff = this->GetAncestorStaff();
++    if (hwStaff && hwStaff->m_drawingStaffDef && hwStaff->m_drawingStaffDef->GetType() == "howe-way"
++        && duration == DURATION_4) {
++        const int semitones = this->GetMIDIPitch() - 60;
++        const bool isUpperMember = ((semitones % 2) + 2) % 2 == 1;
++        return isUpperMember ? SMUFL_E0A4_noteheadBlack : SMUFL_E0A3_noteheadHalf;
++    }
+     static std::map<std::string, char32_t> additionalNoteheadSymbols
+         = { { "noteheadDiamondBlackWide", SMUFL_E0DC_noteheadDiamondBlackWide },
+               { "noteheadDiamondWhiteWide", SMUFL_E0DE_noteheadDiamondWhiteWide },

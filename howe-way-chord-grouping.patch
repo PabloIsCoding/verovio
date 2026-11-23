@@ -1,0 +1,31 @@
+--- a/src/chord.cpp
++++ b/src/chord.cpp
+@@ -144,7 +144,18 @@
+ 
+     Note *curNote, *lastNote = vrv_cast<Note *>(*iter);
+     assert(lastNote);
+-    int lastPitch = lastNote->GetDiatonicPitch();
++    // Howe-Way shares one staff position between each chromatic semitone
++    // pair. Group noteheads by their *engraved* separation, not the
++    // diatonic separation used for conventional notation. This pass runs
++    // before CalcAlignmentPitchPosFunctor assigns drawing locations.
++    const Staff *staff = this->GetAncestorStaff();
++    const bool howeWay = staff && staff->m_drawingStaffDef && staff->m_drawingStaffDef->GetType() == "howe-way";
++    const auto pitchPosition = [howeWay](const Note *note) {
++        if (!howeWay) return note->GetDiatonicPitch();
++        const int semitones = note->GetMIDIPitch() - 60;
++        return (semitones >= 0) ? semitones / 2 : (semitones - 1) / 2;
++    };
++    int lastPitch = pitchPosition(lastNote);
+     ChordNoteGroup *curGroup = NULL;
+ 
+     ++iter;
+@@ -155,7 +166,7 @@
+     while (iter != childList.end()) {
+         curNote = vrv_cast<Note *>(*iter);
+         assert(curNote);
+-        const int curPitch = curNote->GetDiatonicPitch();
++        const int curPitch = pitchPosition(curNote);
+ 
+         if ((curPitch - lastPitch < 2) && (curNote->GetCrossStaff(layer1) == lastNote->GetCrossStaff(layer2))) {
+             if (!lastNote->GetNoteGroup()) {
