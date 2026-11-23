@@ -63,7 +63,7 @@ class HoweWayTest(unittest.TestCase):
 
     def test_accidentals_and_clef(self):
         for render in (self.chromatic, self.chords, self.rhythm):
-            for label in ("accid", "clef"):
+            for label in ("accid", "clef", "keySig"):
                 self.assertFalse(render.root.findall(f".//{{*}}g[@class='{label}']//{{*}}use"))
 
     def test_chords_and_voices(self):
@@ -112,6 +112,8 @@ class HoweWayTest(unittest.TestCase):
         self.assertEqual(self.rhythm.head("whole-high")[2], FILLED)
 
     def test_halves_and_short_values(self):
+        self.assertEqual(self.rhythm.head("key-fs")[1:], self.rhythm.head("key-gf")[1:])
+        self.assertEqual(self.rhythm.head("key-fs")[2], HOLLOW)
         for name, glyph in (("half-c", HOLLOW), ("half-f", FILLED)):
             self.assertEqual(self.rhythm.head(name)[2], glyph)
             self.assertIsNone(group(self.rhythm.ids[name], "stem"))
@@ -147,7 +149,9 @@ class HoweWayTest(unittest.TestCase):
                     for note in ET.parse(file).iterfind(".//{*}note"):
                         accidental = note.find("{*}accid")
                         alteration = note.get("accid") if accidental is None else accidental.get("accid")
-                        result[note.get(XML_ID)] = (note.get("pname"), note.get("oct"), note.get("pnum"), alteration)
+                        gestural = note.get("accid.ges") if accidental is None else accidental.get("accid.ges")
+                        result[note.get(XML_ID)] = (note.get("pname"), note.get("oct"), note.get("pnum"),
+                                                    alteration, gestural)
                     return result
 
                 self.assertEqual(pitches(source), pitches(exported))

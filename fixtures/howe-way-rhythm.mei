@@ -3,7 +3,7 @@
    <meiHead><fileDesc><titleStmt><title>Howe-Way rhythm and ledger lines</title></titleStmt><pubStmt/></fileDesc></meiHead>
    <music><body><mdiv><score>
       <scoreDef meter.count="4" meter.unit="4">
-         <staffGrp><staffDef n="1" type="howe-way" lines="6" clef.shape="G" clef.line="2"/></staffGrp>
+         <staffGrp><staffDef n="1" type="howe-way" lines="6" keysig="1s" clef.shape="G" clef.line="2"/></staffGrp>
       </scoreDef>
       <section>
          <measure n="1"><staff n="1"><layer n="1">
@@ -14,7 +14,7 @@
          </layer></staff></measure>
          <measure n="3"><staff n="1"><layer n="1">
             <note xml:id="half-c" dur="2" pname="c" oct="4"/>
-            <note xml:id="half-f" dur="2" pname="f" oct="4"/>
+            <note xml:id="half-f" dur="2" pname="f" oct="4" accid="n"/>
          </layer></staff></measure>
          <measure n="4"><staff n="1"><layer n="1">
             <note xml:id="dotted" dur="4" dots="1" pname="d" oct="4"/>
@@ -31,6 +31,10 @@
                <note xml:id="whole-third" pname="e" oct="4"/>
                <note xml:id="whole-fifth" pname="g" oct="4"/>
             </chord>
+         </layer></staff></measure>
+         <measure n="6"><staff n="1"><layer n="1">
+            <note xml:id="key-fs" dur="2" pname="f" oct="4" accid.ges="s"/>
+            <note xml:id="key-gf" dur="2" pname="g" oct="4" accid="f"/>
          </layer></staff></measure>
       </section>
    </score></mdiv></body></music>

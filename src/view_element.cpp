@@ -1042,7 +1042,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     const int clefLocOffset = clef->GetClefLocOffset();
 
     // hidden key signature
-    if (!showHidden && (keySig->GetVisible() == BOOLEAN_false)) {
+    if (staff->IsHoweWay() || (!showHidden && (keySig->GetVisible() == BOOLEAN_false))) {
         dc->StartGraphic(element, "", element->GetID());
         keySig->SetEmptyBB();
         dc->EndGraphic(element, this);
