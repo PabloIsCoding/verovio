@@ -352,6 +352,27 @@ FunctorCode CalcStemFunctor::VisitStem(Stem *stem)
     const bool drawingCueSize = stem->GetDrawingCueSize();
     const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
 
+    if (m_staff->IsHoweWay() && (m_dur == DURATION_1 || m_dur == DURATION_2)) {
+        const bool halfNote = (m_dur == DURATION_2);
+        stem->IsVirtual(halfNote);
+        if (halfNote) {
+            stem->SetDrawingStemLen(0);
+            return FUNCTOR_CONTINUE;
+        }
+
+        // Extend the shared stem equally beyond the two outermost heads.
+        const int unit = m_doc->GetDrawingUnit(staffSize);
+        const int extension = drawingCueSize ? m_doc->GetCueSize(2 * unit) : 2 * unit;
+        const bool up = (stem->GetDrawingStemDir() == STEMDIRECTION_up);
+        const int anchorX = up ? m_interface->GetStemUpSE(m_doc, staffSize, drawingCueSize).x - stemShift
+                               : m_interface->GetStemDownNW(m_doc, staffSize, drawingCueSize).x + stemShift;
+        stem->SetDrawingXRel(anchorX);
+        stem->SetDrawingYRel(stem->GetDrawingYRel() + (up ? -extension : extension));
+        const int length = 2 * extension - m_chordStemLength;
+        stem->SetDrawingStemLen(up ? -length : length);
+        return FUNCTOR_CONTINUE;
+    }
+
     // For notes longer than half notes the stem is always 0
     if (m_dur < DURATION_2) {
         stem->SetDrawingXRel(0);
