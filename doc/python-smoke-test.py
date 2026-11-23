@@ -61,10 +61,18 @@ def check_notation_switch() -> None:
         toolkit = verovio.toolkit()
         toolkit.setOptions({"breaks": breaks})
         assert toolkit.loadFile(str(fixture))
+        initial_geometry = None
         for mode, lines in (("encoded", 5), ("howe-way", 6), ("encoded", 5)):
             assert toolkit.setOptions({"notationSystem": mode, "howeWayReferenceOctaves": {"2": 2}})
             toolkit.redoLayout()
             svg = ET.fromstring(toolkit.renderToSVG(1))
+            if mode == "encoded":
+                geometry = [(e.tag, e.get("d"), e.get("transform"), e.get("points")) for e in svg.iter()
+                            if e.tag.rsplit("}", 1)[-1] in ("path", "use", "polygon")]
+                if initial_geometry is None:
+                    initial_geometry = geometry
+                else:
+                    assert geometry == initial_geometry, breaks
             staves = svg.findall(".//{*}g[@class='staff']")
             assert [len(s.findall("{*}path")) for s in staves] == [lines] * 4
             for note, visible in (("bass-whole", lines == 6), ("voice-f", lines == 5)):

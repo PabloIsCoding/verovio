@@ -355,7 +355,10 @@ FunctorCode CalcStemFunctor::VisitStem(Stem *stem)
     // RedoLayout can change notation without recreating the note or its stem.
     if (m_dur == DURATION_1 || m_dur == DURATION_2) {
         const bool stemless = m_staff->IsHoweWay() ? (m_dur == DURATION_2) : (m_dur == DURATION_1);
-        stem->IsVirtual(stemless || stem->GetVisible() == BOOLEAN_false);
+        const bool isVirtual = stemless || stem->GetVisible() == BOOLEAN_false;
+        // Virtual stems skip the bounding-box drawing pass. Discard ink from the previous layout.
+        if (isVirtual && !stem->IsVirtual()) stem->ResetBoundingBox();
+        stem->IsVirtual(isVirtual);
     }
     if (m_staff->IsHoweWay() && (m_dur == DURATION_1 || m_dur == DURATION_2)) {
         if (m_dur == DURATION_2) {
