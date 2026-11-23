@@ -8,6 +8,8 @@
 #ifndef __VRV_CALCCHORDNOTEHEADSFUNCTOR_H__
 #define __VRV_CALCCHORDNOTEHEADSFUNCTOR_H__
 
+#include <map>
+
 #include "functor.h"
 
 namespace vrv {
@@ -51,6 +53,8 @@ private:
 public:
     //
 private:
+    // Signed column relative to the normal side of the stem, keyed by chord tone.
+    std::map<const Note *, int> m_headColumns;
     // The diameter of the anchoring note of the chord
     int m_diameter;
     // The alignment type

@@ -32,6 +32,7 @@ FunctorCode CalcChordNoteHeadsFunctor::VisitChord(Chord *chord)
 {
     Staff *staff = chord->GetAncestorStaff(RESOLVE_CROSS_STAFF);
 
+    m_headColumns.clear();
     // Staff locations are available only after vertical pitch alignment.
     if (!chord->HasCluster()) chord->CalculateNoteGroups();
 
@@ -80,39 +81,37 @@ FunctorCode CalcChordNoteHeadsFunctor::VisitNote(Note *note)
 
     /************** notehead direction **************/
 
-    bool flippedNotehead = false;
-
-    // if the note is in a note group, calculations are different
+    const bool stemUp = (note->GetDrawingStemDir() == STEMDIRECTION_up);
+    int column = 0;
     if (noteGroup) {
-        const int noteGroupPosition = note->GetNoteGroupPosition();
-        if (note->GetDrawingStemDir() == STEMDIRECTION_down) {
-            // stem down/even note group = noteheads start on left (incorrect side)
-            if (noteGroup->size() % 2 == 0) {
-                flippedNotehead = (noteGroupPosition % 2 != 0);
-            }
-            // else they start on normal side
-            else {
-                flippedNotehead = (noteGroupPosition % 2 == 0);
+        if (!m_headColumns.contains(note)) {
+            // Traverse from the stem anchor. Reuse the nearest column whose last head
+            // is at least two staff positions away. Additional columns alternate sides.
+            std::vector<int> lastLoc;
+            for (int i = 0; i < (int)noteGroup->size(); ++i) {
+                const Note *member = stemUp ? (*noteGroup)[i] : (*noteGroup)[noteGroup->size() - 1 - i];
+                const int loc = member->GetDrawingLoc();
+                std::vector<int>::iterator slot = std::find_if(
+                    lastLoc.begin(), lastLoc.end(), [loc](int prev) { return std::abs(loc - prev) >= 2; });
+                const int index = (int)std::distance(lastLoc.begin(), slot);
+                if (slot == lastLoc.end()) {
+                    lastLoc.push_back(loc);
+                }
+                else {
+                    *slot = loc;
+                }
+                m_headColumns[member] = (index % 2) ? (index + 1) / 2 : -index / 2;
             }
         }
-        else {
-            // flipped noteheads start on normal side no matter what
-            flippedNotehead = (noteGroupPosition % 2 == 0);
-        }
+        column = m_headColumns.at(note);
     }
 
-    // positions notehead
-    if (flippedNotehead) {
-        if (note->GetDrawingStemDir() == STEMDIRECTION_up) {
-            note->SetDrawingXRel(diameter - m_doc->GetDrawingStemWidth(staffSize));
-        }
-        else {
-            note->SetDrawingXRel(-diameter + m_doc->GetDrawingStemWidth(staffSize));
-        }
+    if (column) {
+        const int advance = diameter - m_doc->GetDrawingStemWidth(staffSize);
+        note->SetDrawingXRel(column * (stemUp ? advance : -advance));
     }
     note->SetDrawingXRel(note->GetDrawingXRel() + noteheadShift);
-
-    note->SetFlippedNotehead(flippedNotehead);
+    note->SetFlippedNotehead(column > 0);
 
     return FUNCTOR_SIBLINGS;
 }

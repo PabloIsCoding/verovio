@@ -29,18 +29,19 @@
       </staff></measure>
       <measure n="4"><staff n="1"><layer n="1">
         <!-- Two adjacent filled/hollow pairs require more than alternating stem sides. -->
-        <chord dur="2" stem.dir="up">
+        <chord dur="4" stem.dir="up">
           <note xml:id="dense-up-c" pname="c" oct="4"/>
           <note xml:id="dense-up-cs" pname="c" oct="4" accid="s"/>
           <note xml:id="dense-up-d" pname="d" oct="4"/>
           <note xml:id="dense-up-ds" pname="d" oct="4" accid="s"/>
         </chord>
-        <chord dur="2" stem.dir="down">
+        <chord dur="4" stem.dir="down">
           <note xml:id="dense-down-c" pname="c" oct="4"/>
           <note xml:id="dense-down-cs" pname="c" oct="4" accid="s"/>
           <note xml:id="dense-down-d" pname="d" oct="4"/>
           <note xml:id="dense-down-ds" pname="d" oct="4" accid="s"/>
         </chord>
+        <rest dur="2"/>
       </layer></staff></measure>
     </section>
   </score></mdiv></body></music>
