@@ -24,10 +24,10 @@ def segment(path):
 
 
 class Render:
-    def __init__(self, source, directory):
+    def __init__(self, source, directory, *options):
         output = directory / (source.stem + ".svg")
         subprocess.run([str(CLI), "-r", str(ROOT / "data"), "--xml-id-seed", "1",
-                        "-o", str(output), str(source)], check=True, capture_output=True)
+                        *options, "-o", str(output), str(source)], check=True, capture_output=True)
         self.root = ET.parse(output).getroot()
         self.ids = {e.get("id"): e for e in self.root.iter() if "id" in e.attrib}
 
@@ -157,6 +157,64 @@ class HoweWayTest(unittest.TestCase):
                 self.assertEqual(pitches(source), pitches(exported))
                 render = self.chords if name.endswith("chords") else self.rhythm
                 self.assertEqual(set(pitches(source)), {key for key, e in render.ids.items() if e.get("class") == "note"})
+
+    def test_piano_rendering_option(self):
+        source = ROOT / "fixtures/piano-pitch-context.mei"
+        mode = ["--notation-system", "howe-way"]
+        piano = [*mode, "--howe-way-reference-octaves", '{"2":2}']
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            encoded = Render(source, directory)
+            hw = Render(source, directory, *piano)
+            common_reference = Render(source, directory, *mode)
+            def staves(render):
+                return render.root.findall(".//{*}g[@class='staff']")
+            self.assertEqual([len(s.findall("{*}path")) for s in staves(encoded)], [5] * 4)
+            self.assertEqual([len(s.findall("{*}path")) for s in staves(hw)], [6] * 4)
+            for kind in ("clef", "keySig", "accid"):
+                path = f".//{{*}}g[@class='{kind}']//{{*}}use"
+                self.assertTrue(encoded.root.findall(path))
+                self.assertFalse(hw.root.findall(path))
+
+            # Measure note positions from each staff's own bottom line.
+            expected = {"key-f": (3, HOLLOW), "natural-f": (2, FILLED), "carry-f": (2, FILLED),
+                        "voice-f": (2, FILLED), "upper-c": (0, HOLLOW), "bass-c": (0, HOLLOW), "bass-f": (3, HOLLOW),
+                        "other-staff-f": (15, HOLLOW), "lower-c": (12, HOLLOW), "reset-f": (3, HOLLOW),
+                        "changed-key-f": (2, FILLED), "sharp-f": (3, HOLLOW), "other-octave-f": (8, FILLED)}
+            def loc(render, key):
+                staff = next(s for s in staves(render) if s.find(f".//*[@id='{key}']") is not None)
+                lines = [segment(path)[1] for path in staff.findall("{*}path")]
+                _, y, head = render.head(key)
+                return (lines[-1] - y) / ((lines[1] - lines[0]) / 2), head
+            for key, pitch in expected.items():
+                with self.subTest(note=key):
+                    self.assertEqual(loc(hw, key), pitch)
+                    self.assertIn(key, encoded.ids)
+            self.assertEqual(loc(common_reference, "lower-c"), (0, HOLLOW))
+            self.assertEqual(loc(common_reference, "bass-c"), (-12, HOLLOW))
+
+            for fmt in ("midi", "mei"):
+                outputs = []
+                for index, flags in enumerate(([], piano)):
+                    output = directory / (str(index) + (".mid" if fmt == "midi" else ".mei"))
+                    subprocess.run([str(CLI), "-r", str(ROOT / "data"), "--xml-id-seed", "1", *flags,
+                                    "-t", fmt, "-o", str(output), str(source)], check=True, capture_output=True)
+                    outputs.append(output.read_bytes())
+                self.assertEqual(outputs[0], outputs[1])
+
+    def test_reference_fallback_and_percussion(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            source = ROOT / "fixtures/piano-pitch-context.mei"
+            default = Render(source, directory, "--notation-system", "howe-way")
+            invalid = Render(source, directory, "--notation-system", "howe-way",
+                             "--howe-way-reference-octaves", '{"2":2.5}')
+            self.assertEqual(default.head("bass-c"), invalid.head("bass-c"))
+            percussion = directory / "percussion.mei"
+            percussion.write_text(source.read_text().replace('clef.shape="F"', 'clef.shape="perc"'))
+            mixed = Render(percussion, directory, "--notation-system", "howe-way")
+            staves = mixed.root.findall(".//{*}g[@class='staff']")
+            self.assertEqual([len(s.findall("{*}path")) for s in staves], [6, 5, 6, 5])
 
     def test_traditional(self):
         self.assertEqual(len(self.traditional.lines()), 5)

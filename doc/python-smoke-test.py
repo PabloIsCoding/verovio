@@ -5,6 +5,8 @@ discoverable, and a trivial render returns SVG on the active interpreter.
 """
 
 import importlib.resources as resources
+from pathlib import Path
+from xml.etree import ElementTree as ET
 
 import verovio
 
@@ -53,9 +55,27 @@ def run_smoke_test() -> None:
     assert "<svg" in svg, "renderToSVG did not return SVG output"
 
 
+def check_notation_switch() -> None:
+    fixture = Path(__file__).resolve().parents[1] / "fixtures" / "piano-pitch-context.mei"
+    for breaks in ("auto", "none"):
+        toolkit = verovio.toolkit()
+        toolkit.setOptions({"breaks": breaks})
+        assert toolkit.loadFile(str(fixture))
+        for mode, lines in (("encoded", 5), ("howe-way", 6), ("encoded", 5)):
+            assert toolkit.setOptions({"notationSystem": mode, "howeWayReferenceOctaves": {"2": 2}})
+            toolkit.redoLayout()
+            svg = ET.fromstring(toolkit.renderToSVG(1))
+            staves = svg.findall(".//{*}g[@class='staff']")
+            assert [len(s.findall("{*}path")) for s in staves] == [lines] * 4
+            for note, visible in (("bass-whole", lines == 6), ("voice-f", lines == 5)):
+                stem = svg.find(f".//*[@id='{note}']/{{*}}g[@class='stem']/{{*}}path")
+                assert (stem is not None) == visible, (breaks, mode, note)
+
+
 def main() -> None:
     try:
         run_smoke_test()
+        check_notation_switch()
     except Exception as exc:
         print(f"SMOKE TEST FAIL: {exc}")
         raise
