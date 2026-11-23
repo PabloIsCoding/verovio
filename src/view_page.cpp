@@ -429,8 +429,8 @@ void View::DrawGrpSym(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, i
     const int staffSize = staffGrp->GetMaxStaffSize();
     int yTop = first->GetDrawingY();
     // for the bottom position we need to take into account the number of lines and the staff size
-    int yBottom = last->GetDrawingY()
-        - (last->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
+    int yBottom
+        = last->GetDrawingY() - (last->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
     // for the bottom position we need to take into account the number of lines and the staff size
     if (first->m_drawingLines <= 1) yTop += m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
     if (last->m_drawingLines <= 1) yBottom -= m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);

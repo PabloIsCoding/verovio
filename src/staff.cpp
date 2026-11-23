@@ -253,7 +253,9 @@ void Staff::SetDrawingNotation(const StaffDef *staffDef, const Options *options)
     m_drawingNotationType = staffDef->GetNotationtype();
     m_drawingLines = staffDef->GetLines();
     m_howeWayReferenceOctave = -1;
-    const bool convert = options->m_notationSystem.GetValue() == NOTATION_SYSTEM_howeWay
+    const data_CLEFSHAPE shape = staffDef->GetCurrentClef()->GetShape();
+    const bool convert = shape != CLEFSHAPE_perc && shape != CLEFSHAPE_TAB
+        && options->m_notationSystem.GetValue() == NOTATION_SYSTEM_howeWay
         && (m_drawingNotationType == NOTATIONTYPE_NONE || m_drawingNotationType == NOTATIONTYPE_cmn)
         && (m_drawingLines == 5);
     if (!convert && staffDef->GetType() != "howe-way") return;
