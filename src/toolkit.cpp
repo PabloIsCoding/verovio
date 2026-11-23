@@ -1651,6 +1651,11 @@ void Toolkit::RedoLayout(const std::string &jsonOptions)
     else if (m_options->m_breaks.GetValue() != BREAKS_none) {
         m_doc.CastOffDoc();
     }
+    else {
+        // Continuous layout retains its page and staff definitions when uncasting is a no-op.
+        m_doc.ScoreDefSetCurrentDoc(true);
+        if (Page *page = m_doc.SetDrawingPage(0)) page->DeprecateLayout();
+    }
 }
 
 void Toolkit::RedoPagePitchPosLayout()

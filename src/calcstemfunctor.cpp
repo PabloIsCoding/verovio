@@ -352,10 +352,13 @@ FunctorCode CalcStemFunctor::VisitStem(Stem *stem)
     const bool drawingCueSize = stem->GetDrawingCueSize();
     const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
 
+    // RedoLayout can change notation without recreating the note or its stem.
+    if (m_dur == DURATION_1 || m_dur == DURATION_2) {
+        const bool stemless = m_staff->IsHoweWay() ? (m_dur == DURATION_2) : (m_dur == DURATION_1);
+        stem->IsVirtual(stemless || stem->GetVisible() == BOOLEAN_false);
+    }
     if (m_staff->IsHoweWay() && (m_dur == DURATION_1 || m_dur == DURATION_2)) {
-        const bool halfNote = (m_dur == DURATION_2);
-        stem->IsVirtual(halfNote);
-        if (halfNote) {
+        if (m_dur == DURATION_2) {
             stem->SetDrawingStemLen(0);
             return FUNCTOR_CONTINUE;
         }
