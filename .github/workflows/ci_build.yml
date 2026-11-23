@@ -202,6 +202,8 @@ jobs:
           cmake ../cmake
           make -j8
 
+      - name: Check Howe-Way and conventional engraving
+        run: python3 fixtures/check-howe-way.py tools/verovio
 
   ##################################
   # Build the Java toolkit         #
