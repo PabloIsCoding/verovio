@@ -32,6 +32,9 @@ FunctorCode CalcChordNoteHeadsFunctor::VisitChord(Chord *chord)
 {
     Staff *staff = chord->GetAncestorStaff(RESOLVE_CROSS_STAFF);
 
+    // Staff locations are available only after vertical pitch alignment.
+    if (!chord->HasCluster()) chord->CalculateNoteGroups();
+
     m_diameter = 0;
     if (chord->GetDrawingStemDir() == STEMDIRECTION_up) {
         if (chord->IsInBeam()) {
