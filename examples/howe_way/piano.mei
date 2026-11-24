@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.0">
+   <meiHead><fileDesc><titleStmt><title>Piano pitch context</title></titleStmt><pubStmt/></fileDesc></meiHead>
+   <music><body><mdiv><score>
+      <scoreDef meter.count="4" meter.unit="4" keysig="1s">
+         <staffGrp symbol="brace" bar.thru="true">
+            <staffDef n="1" lines="5" clef.shape="G" clef.line="2"/>
+            <staffDef n="2" lines="5" clef.shape="F" clef.line="4"/>
+         </staffGrp>
+      </scoreDef>
+      <section>
+         <measure n="1">
+            <staff n="1"><layer n="1">
+               <note xml:id="key-f" pname="f" oct="4" dur="4"/>
+               <note xml:id="natural-f" pname="f" oct="4" accid="n" dur="4"/>
+               <note xml:id="carry-f" pname="f" oct="4" dur="4"/>
+               <note xml:id="upper-c" pname="c" oct="4" dur="4"/>
+            </layer>
+            <layer n="2"><rest dur="2"/><note xml:id="voice-f" pname="f" oct="4" dur="2"/></layer></staff>
+            <staff n="2"><layer n="1">
+               <note xml:id="bass-c" pname="c" oct="2" dur="4"/>
+               <note xml:id="bass-f" pname="f" oct="2" dur="4"/>
+               <note xml:id="other-staff-f" pname="f" oct="4" dur="4"/>
+               <note xml:id="lower-c" pname="c" oct="4" dur="4"/>
+            </layer></staff>
+         </measure>
+         <measure n="2">
+            <staff n="1"><layer n="1">
+               <note xml:id="reset-f" pname="f" oct="4" dur="4"/>
+               <keySig sig="0"/>
+               <note xml:id="changed-key-f" pname="f" oct="4" dur="4"/>
+               <note xml:id="sharp-f" pname="f" oct="4" accid="s" dur="4"/>
+               <note xml:id="other-octave-f" pname="f" oct="5" dur="4"/>
+            </layer></staff>
+            <staff n="2"><layer n="1">
+               <note xml:id="bass-whole" pname="c" oct="2" dur="1"/>
+            </layer></staff>
+         </measure>
+         <measure n="3">
+            <staff n="1"><layer n="1">
+               <chord dur="4"><note xml:id="tri-c" pname="c" oct="4"/><note xml:id="tri-e" pname="e" oct="4"/><note xml:id="tri-g" pname="g" oct="4"/></chord>
+               <chord dur="4"><note xml:id="pair-d" pname="d" oct="4"/><note xml:id="pair-ef" pname="e" oct="4"><accid accid="f"/></note></chord>
+               <note xml:id="enh-ds" pname="d" oct="4" accid="s" dur="8"/>
+               <note xml:id="short-c" pname="c" oct="4" dur="8"/><rest dur="4"/>
+            </layer></staff>
+            <staff n="2"><layer n="1"><mRest/></layer></staff>
+         </measure>
+      </section>
+   </score></mdiv></body></music>
+</mei>
