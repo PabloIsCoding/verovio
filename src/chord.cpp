@@ -139,12 +139,21 @@ void Chord::CalculateNoteGroups()
 {
     this->ClearNoteGroups();
 
-    const ListOfObjects &childList = this->GetList();
+    ListOfObjects childList = this->GetList();
+    if (childList.empty()) return;
+    // Sort a layout-only copy: enharmonic spellings can reverse the written pitch order.
+    childList.sort([](const Object *a, const Object *b) {
+        const Note *left = vrv_cast<const Note *>(a);
+        const Note *right = vrv_cast<const Note *>(b);
+        const int leftStaff = left->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
+        const int rightStaff = right->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
+        return std::make_pair(leftStaff, left->GetDrawingLoc()) < std::make_pair(rightStaff, right->GetDrawingLoc());
+    });
     ListOfObjects::const_iterator iter = childList.begin();
 
     Note *curNote, *lastNote = vrv_cast<Note *>(*iter);
     assert(lastNote);
-    int lastPitch = lastNote->GetDiatonicPitch();
+    int lastPitch = lastNote->GetDrawingLoc();
     ChordNoteGroup *curGroup = NULL;
 
     ++iter;
@@ -155,7 +164,7 @@ void Chord::CalculateNoteGroups()
     while (iter != childList.end()) {
         curNote = vrv_cast<Note *>(*iter);
         assert(curNote);
-        const int curPitch = curNote->GetDiatonicPitch();
+        const int curPitch = curNote->GetDrawingLoc();
 
         if ((curPitch - lastPitch < 2) && (curNote->GetCrossStaff(layer1) == lastNote->GetCrossStaff(layer2))) {
             if (!lastNote->GetNoteGroup()) {
